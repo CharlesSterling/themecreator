@@ -1,0 +1,221 @@
+﻿
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Paletton Widget DEMO – Custom colorizer</title>
+
+    <script type="text/javascript" src="http://paletton.com/widget/js/widget.js">
+
+
+
+
+
+
+    </script>
+
+</head>
+<body>
+
+
+    <h1>Chucks Demo – Color Theme Creator Application</h1>
+
+    <p>
+        This is a web page by Charles Sterling, hosted on Azure. The <a href="http://paletton.com/">Paletton Live Colorizer</a> is loaded into it.
+    </p>
+    <p>
+        Click the 'Create Theme' button to open the Colorizer widget. Feel free to play with the colors. When done, click the "Apply" button. The palette you chose will be used to create a color theme. If you click "Cancel" instead, an empty object is returned.
+    </p>
+
+    <button id="col-btn-less">Create Color Theme</button>
+
+    <hr>
+
+    <p>
+        In the visual arts, color theory or colour theory is a body of practical guidance to color mixing and the visual effects of a specific color combination. There are also definitions (or categories) of colors based on the color wheel: primary color, secondary color[1] and tertiary color. Although color theory principles first appeared in the writings of Leone Battista Alberti (c.1435) and the notebooks of Leonardo da Vinci (c.1490), a tradition of "colory theory" began in the 18th century, initially within a partisan controversy over Isaac Newton's theory of color (Opticks, 1704) and the nature of primary colors. From there it developed as an independent artistic tradition with only superficial reference to colorimetry and vision science.
+    </p>
+
+
+    
+
+
+    <script type="text/javascript">
+
+/* The Colorizer OPTIONS object */
+
+	var colorizerOptions = {
+
+		width:	960,
+		/* min width 640 */
+
+		height: 500,
+		/* min height 500 */
+
+		dark: true,
+		/* or true */
+
+		templateURL: 'http://colorschemedesigner.com/colorizer-demo/template-custom/index.html',
+		/* preview document, must be full URL incl. protocol://domain */
+
+		paletteUID: 'b5p0H4W0kl1tFbjKJgH-bpGr6smln', // '55p0u0kleqtbzEKgVuIpcmGtdhZ',
+		/* my hand-picked initial palette (4-colors in this case) */
+
+		paletteUIDdefault: 'b000W5a0kllllaFw0g0qFqFg0w0aF',
+		/* my hand-picked default palette (to be used for reset) - be sure to use the same model! */
+
+		colorizeMode: 'custom'
+		/* possible values: class | less | custom */
+
+		}
+
+/* Get the button in the DOM */
+
+	var btn = document.getElementById('col-btn-less');
+
+/* Add onclick event handler */
+/* Feel free to use btn.addEventListener() or any other method you prefer */
+
+	btn.onclick = function(e){
+		e.preventDefault();
+		_paletton.open(colorizerOptions, colorizerCallback);
+		}
+
+
+
+/* Your custom callback */
+/* This one just gets the Colorizer data and dumps them into the page as a readable text */
+
+	function colorizerCallback(data){
+		// data = { colorTable, paletteUID, myData }
+		// your code here
+
+		var res = document.getElementById('res'), html = '';
+
+		if (!data) {
+			res.innerHTML = 'cancelled, empty object returned';
+			return
+			}
+
+		colorizerOptions.paletteUID = data.paletteUID;
+		/* storing the palette for next time */
+
+
+
+
+
+		function parse(obj, prefix) {
+		// a dummy recursive parser just to print out the data
+		    //works chass
+		    //alert(obj.colorTable.byPalette.pri[1]);
+		    //chass
+		    var str1 = '';
+
+		    // return;
+
+
+		    //str1 = '{"name": "Chucks","dataColors": ["#F19CB6"]}'
+
+
+
+		    try {
+
+		        str1 = '{"name": "Chucks","dataColors": ["' + obj.colorTable.byPalette.pri[0];
+		        str1 += '" , "' + obj.colorTable.byPalette.pri[1];
+		        str1 += '" , "' + obj.colorTable.byPalette.pri[2];
+		        str1 += '" , "' + obj.colorTable.byPalette.pri[3];
+		        str1 += '" , "' + obj.colorTable.byPalette.pri[4];
+		        str1 += '"]}';
+
+
+		       // str1 = '{"name": "Chucks","dataColors": ["#F19CB6"]}'
+		       //download(str1, 'c:\pbi\myfilename0.txt', 'text/plain');
+		        download(str1, 'Chucktheme.json', 'text/plain');
+
+		        // return;
+
+
+		        //str1 += obj.colorTable.byPalette.pri[1];
+		    //	"#F19CB6"	String
+		    }
+		    catch (error) {
+		     //   return;
+		        //print("Caught: " + error.message);
+		    }
+
+		    //download(str1, 'myfilename1.txt', 'text/plain');
+
+
+            //chass
+
+		    var k, x, str = '{\n';
+			for (k in obj) {
+			   // alert(obj[k]);
+			    x = obj[k];
+				str += prefix + '   ' + k + ': ';
+				if (typeof x==='undefined' || x===null) str += 'null';
+				else if (typeof x==='object') str += parse(x, prefix + '   ');
+
+                else str += x;
+
+			//works but inside loop	alert(str);
+				str += '\n';
+				}
+			str += prefix + '   ' + '}';
+			return str;
+			}
+
+		html = parse(data,'');
+		res.innerHTML = '<b>result</b> = ' + html;
+
+		} // callback
+
+
+	// Function to download data to a file
+	function download(data, filename, type) {
+	    var a = document.createElement("a"),
+            file = new Blob([data], { type: type });
+	    if (window.navigator.msSaveOrOpenBlob) // IE10+
+	        window.navigator.msSaveOrOpenBlob(file, filename);
+	    else { // Others
+	        var url = URL.createObjectURL(file);
+	        a.href = url;
+	        a.download = filename;
+	        document.body.appendChild(a);
+	        a.click();
+	        setTimeout(function () {
+	            document.body.removeChild(a);
+	            window.URL.revokeObjectURL(url);
+	        }, 0);
+	    }
+	}
+
+    </script>
+
+
+<pre id="res"></pre>
+
+
+    <p>
+        Color abstractions[edit]
+
+        Additive color mixing
+
+        Subtractive color mixing
+        The foundations of pre-20th-century color theory were built around "pure" or ideal colors, characterized by sensory experiences rather than attributes of the physical world. This has led to a number of inaccuracies in traditional color theory principles that are not always remedied in modern formulations.[citation needed]
+
+        The most important problem has been a confusion between the behavior of light mixtures, called additive color, and the behavior of paint, ink, dye, or pigment mixtures, called subtractive color. This problem arises because the absorption of light by material substances follows different rules from the perception of light by the eye.
+
+        A second problem has been the failure to describe the very important effects of strong luminance (lightness) contrasts in the appearance of colors reflected from a surface (such as paints or inks) as opposed to colors of light; "colors" such as browns or ochres cannot appear in mixtures of light. Thus, a strong lightness contrast between a mid-valued yellow paint and a surrounding bright white makes the yellow appear to be green or brown, while a strong brightness contrast between a rainbow and the surrounding sky makes the yellow in a rainbow appear to be a fainter yellow, or white.
+    </p>
+
+    <hr>
+
+    <p>
+        <!--<small>
+            Copyright 2014 © <a href="http://paletton.com">Paletton.com</a> | Back to <a href="index.html">Demos</a> or the <a href="http://paletton.com/widget">Paletton Live Colorizer documentation</a>
+        </small>-->
+    </p>
+
+
+</body>
+</html>
